@@ -1,10 +1,15 @@
-import { User } from "./models/User"
+import { User } from './models/User'
 
-console.log('hi there')
 
-const user = new User({name: 'hase', age: 36})
-user.set({age: 23})
-user.on('hase', () => {})
+const data = {
+  name: 'hase',
+  age: 23
+}
 
-console.log(user)
-
+// fetch('http://localhost:3000/users', {
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json'
+//   },
+//   body: JSON.stringify(data)
+// }).then((respons) => respons.json).then((data) => console.log(data))

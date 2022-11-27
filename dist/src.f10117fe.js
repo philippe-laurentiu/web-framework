@@ -117,59 +117,24 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/models/User.ts":[function(require,module,exports) {
+})({"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.User = void 0;
-var User = /** @class */function () {
-  function User(data) {
-    this.data = data;
-    this.events = {};
-  }
-  User.prototype.get = function (propName) {
-    return this.data[propName];
-  };
-  User.prototype.set = function (update) {
-    Object.assign(this.data, update);
-  };
-  User.prototype.on = function (eventName, callback) {
-    var handlers = this.events[eventName] || [];
-    handlers.push(callback);
-    this.events[eventName] = handlers;
-  };
-  User.prototype.trigger = function (eventName) {
-    var handlers = this.events[eventName];
-    if (!handlers || handlers.length === 0) {
-      return;
-    }
-    handlers.forEach(function (callback) {
-      callback();
-    });
-  };
-  return User;
-}();
-exports.User = User;
-},{}],"src/index.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var User_1 = require("./models/User");
-console.log('hi there');
-var user = new User_1.User({
+var data = {
   name: 'hase',
-  age: 36
-});
-user.set({
   age: 23
-});
-user.on('hase', function () {});
-console.log(user);
-},{"./models/User":"src/models/User.ts"}],"../../../.nvm/versions/node/v18.11.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+};
+// fetch('http://localhost:3000/users', {
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json'
+//   },
+//   body: JSON.stringify(data)
+// }).then((respons) => respons.json).then((data) => console.log(data))
+},{}],"../../../.nvm/versions/node/v18.11.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -194,7 +159,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34673" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37367" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
