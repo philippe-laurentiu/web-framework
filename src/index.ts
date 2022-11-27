@@ -2,9 +2,13 @@ import { User } from './models/User'
 
 
 const data = {
+  id: 1,
   name: 'hase',
-  age: 23
+  age: 24
 }
+
+const user = new User(data)
+user.fetch()
 
 // fetch('http://localhost:3000/users', {
 //   method: 'POST',

@@ -117,16 +117,95 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/index.ts":[function(require,module,exports) {
+})({"src/models/User.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.User = void 0;
+var User = /** @class */function () {
+  function User(data) {
+    this.data = data;
+    this.events = {};
+  }
+  User.prototype.get = function (propName) {
+    return this.data[propName];
+  };
+  User.prototype.set = function (update) {
+    Object.assign(this.data, update);
+  };
+  User.prototype.on = function (eventName, callback) {
+    var handlers = this.events[eventName] || [];
+    handlers.push(callback);
+    this.events[eventName] = handlers;
+  };
+  User.prototype.trigger = function (eventName) {
+    var handlers = this.events[eventName];
+    if (!handlers || handlers.length === 0) {
+      return;
+    }
+    handlers.forEach(function (callback) {
+      callback();
+    });
+  };
+  User.prototype.fetch = function () {
+    fetch("http://localhost:3000/users/".concat(this.get('id')), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(function (respons) {
+      return respons.json;
+    }).then(function (data) {
+      return console.log('test');
+    });
+  };
+  User.prototype.save = function () {
+    var id = this.get('id');
+    if (id) {
+      fetch("http://localhost:3000/users/".concat(id), {
+        method: 'PUTS',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.data)
+      }).then(function (respons) {
+        return respons.json;
+      }).then(function (data) {
+        return console.log(data);
+      });
+    } else {
+      fetch("http://localhost:3000/users", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.data)
+      }).then(function (respons) {
+        return respons.json;
+      }).then(function (data) {
+        return console.log(data);
+      });
+    }
+  };
+  return User;
+}();
+exports.User = User;
+},{}],"src/index.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var User_1 = require("./models/User");
 var data = {
+  id: 1,
   name: 'hase',
-  age: 23
+  age: 24
 };
+var user = new User_1.User(data);
+user.fetch();
 // fetch('http://localhost:3000/users', {
 //   method: 'POST',
 //   headers: {
@@ -134,7 +213,7 @@ var data = {
 //   },
 //   body: JSON.stringify(data)
 // }).then((respons) => respons.json).then((data) => console.log(data))
-},{}],"../../../.nvm/versions/node/v18.11.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./models/User":"src/models/User.ts"}],"../../../.nvm/versions/node/v18.11.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
