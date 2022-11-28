@@ -117,30 +117,43 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/models/User.ts":[function(require,module,exports) {
+})({"src/models/Attributes.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.User = void 0;
-var User = /** @class */function () {
-  function User(data) {
+exports.Attributes = void 0;
+var Attributes = /** @class */function () {
+  function Attributes(data) {
     this.data = data;
-    this.events = {};
   }
-  User.prototype.get = function (propName) {
+  Attributes.prototype.get = function (propName) {
     return this.data[propName];
   };
-  User.prototype.set = function (update) {
+  Attributes.prototype.set = function (update) {
     Object.assign(this.data, update);
   };
-  User.prototype.on = function (eventName, callback) {
+  return Attributes;
+}();
+exports.Attributes = Attributes;
+},{}],"src/models/Eventing.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Eventing = void 0;
+var Eventing = /** @class */function () {
+  function Eventing() {
+    this.events = {};
+  }
+  Eventing.prototype.on = function (eventName, callback) {
     var handlers = this.events[eventName] || [];
     handlers.push(callback);
     this.events[eventName] = handlers;
   };
-  User.prototype.trigger = function (eventName) {
+  Eventing.prototype.trigger = function (eventName) {
     var handlers = this.events[eventName];
     if (!handlers || handlers.length === 0) {
       return;
@@ -149,50 +162,102 @@ var User = /** @class */function () {
       callback();
     });
   };
-  User.prototype.fetch = function () {
-    fetch("http://localhost:3000/users/".concat(this.get('id')), {
+  return Eventing;
+}();
+exports.Eventing = Eventing;
+},{}],"src/models/Sync.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Sync = void 0;
+var Sync = /** @class */function () {
+  function Sync(rootUrl) {
+    this.rootUrl = rootUrl;
+  }
+  Sync.prototype.fetch = function (id) {
+    return fetch("".concat(this.rootUrl, "/").concat(id), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       }
-    }).then(function (respons) {
-      return respons.json;
-    }).then(function (data) {
-      return console.log('test');
     });
+    // .then((respons) => respons.json)
+    // .then((data) => console.log('test'))
   };
-  User.prototype.save = function () {
-    var id = this.get('id');
+
+  Sync.prototype.save = function (data) {
+    var id = data.id;
     if (id) {
-      fetch("http://localhost:3000/users/".concat(id), {
+      return fetch("".concat(this.rootUrl, "/").concat(id), {
         method: 'PUTS',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(this.data)
-      }).then(function (respons) {
-        return respons.json;
-      }).then(function (data) {
-        return console.log(data);
+        body: JSON.stringify(data)
       });
+      // .then((respons) => respons.json)
+      // .then((data) => console.log(data))
     } else {
-      fetch("http://localhost:3000/users", {
+      return fetch("".concat(this.rootUrl), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(this.data)
-      }).then(function (respons) {
-        return respons.json;
-      }).then(function (data) {
-        return console.log(data);
+        body: JSON.stringify(data)
       });
+      // .then((respons) => respons.json)
+      // .then((data) => console.log(data))
     }
   };
+
+  return Sync;
+}();
+exports.Sync = Sync;
+},{}],"src/models/User.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.User = void 0;
+var Attributes_1 = require("./Attributes");
+var Eventing_1 = require("./Eventing");
+var Sync_1 = require("./Sync");
+var rootUrl = 'http://localhost:3000/users';
+var User = /** @class */function () {
+  function User(attrs) {
+    this.attrs = attrs;
+    this.events = new Eventing_1.Eventing();
+    this.sync = new Sync_1.Sync(rootUrl);
+    this.attributes = new Attributes_1.Attributes(attrs);
+  }
+  Object.defineProperty(User.prototype, "on", {
+    get: function get() {
+      return this.events.on;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(User.prototype, "trigger", {
+    get: function get() {
+      return this.events.trigger;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(User.prototype, "get", {
+    get: function get() {
+      return this.attributes.get;
+    },
+    enumerable: false,
+    configurable: true
+  });
   return User;
 }();
 exports.User = User;
-},{}],"src/index.ts":[function(require,module,exports) {
+},{"./Attributes":"src/models/Attributes.ts","./Eventing":"src/models/Eventing.ts","./Sync":"src/models/Sync.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -205,14 +270,10 @@ var data = {
   age: 24
 };
 var user = new User_1.User(data);
-user.fetch();
-// fetch('http://localhost:3000/users', {
-//   method: 'POST',
-//   headers: {
-//     'Content-Type': 'application/json'
-//   },
-//   body: JSON.stringify(data)
-// }).then((respons) => respons.json).then((data) => console.log(data))
+user.on('hase', function () {
+  console.log('tada');
+});
+user.trigger('hase');
 },{"./models/User":"src/models/User.ts"}],"../../../.nvm/versions/node/v18.11.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -238,7 +299,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37367" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "32979" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

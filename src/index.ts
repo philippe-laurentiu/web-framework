@@ -7,3 +7,9 @@ const data = {
 }
 
 const user = new User(data)
+
+user.on('hase', () => {
+  console.log('tada')
+})
+
+user.trigger('hase')
