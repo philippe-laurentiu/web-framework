@@ -126,11 +126,12 @@ Object.defineProperty(exports, "__esModule", {
 exports.Attributes = void 0;
 var Attributes = /** @class */function () {
   function Attributes(data) {
+    var _this = this;
     this.data = data;
+    this.get = function (propName) {
+      return _this.data[propName];
+    };
   }
-  Attributes.prototype.get = function (propName) {
-    return this.data[propName];
-  };
   Attributes.prototype.set = function (update) {
     Object.assign(this.data, update);
   };
@@ -146,22 +147,23 @@ Object.defineProperty(exports, "__esModule", {
 exports.Eventing = void 0;
 var Eventing = /** @class */function () {
   function Eventing() {
+    var _this = this;
     this.events = {};
+    this.on = function (eventName, callback) {
+      var handlers = _this.events[eventName] || [];
+      handlers.push(callback);
+      _this.events[eventName] = handlers;
+    };
+    this.trigger = function (eventName) {
+      var handlers = _this.events[eventName];
+      if (!handlers || handlers.length === 0) {
+        return;
+      }
+      handlers.forEach(function (callback) {
+        callback();
+      });
+    };
   }
-  Eventing.prototype.on = function (eventName, callback) {
-    var handlers = this.events[eventName] || [];
-    handlers.push(callback);
-    this.events[eventName] = handlers;
-  };
-  Eventing.prototype.trigger = function (eventName) {
-    var handlers = this.events[eventName];
-    if (!handlers || handlers.length === 0) {
-      return;
-    }
-    handlers.forEach(function (callback) {
-      callback();
-    });
-  };
   return Eventing;
 }();
 exports.Eventing = Eventing;
@@ -254,6 +256,22 @@ var User = /** @class */function () {
     enumerable: false,
     configurable: true
   });
+  User.prototype.set = function (update) {
+    this.attributes.set(update);
+    this.events.trigger('change');
+  };
+  User.prototype.fetch = function () {
+    var _this = this;
+    var id = this.attributes.get('id');
+    if (typeof id !== 'number') {
+      throw new Error('Error: unabel to fetch');
+    }
+    this.sync.fetch(id).then(function (respones) {
+      return respones.json();
+    }).then(function (res) {
+      return _this.set(res);
+    });
+  };
   return User;
 }();
 exports.User = User;
@@ -270,10 +288,10 @@ var data = {
   age: 24
 };
 var user = new User_1.User(data);
-user.on('hase', function () {
-  console.log('tada');
+user.on('change', function () {
+  console.log(user);
 });
-user.trigger('hase');
+user.fetch();
 },{"./models/User":"src/models/User.ts"}],"../../../.nvm/versions/node/v18.11.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -299,7 +317,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "32979" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "46783" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

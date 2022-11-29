@@ -29,4 +29,24 @@ export class User {
   get get() {
     return this.attributes.get
   }
+
+  set(update: UserProps) {
+    this.attributes.set(update)
+    this.events.trigger('change')
+  }
+
+  fetch(): void {
+    const id = this.attributes.get('id')
+
+    if (typeof id !== 'number') {
+      throw new Error('Error: unabel to fetch')
+    }
+
+    this.sync
+      .fetch(id)
+      .then((respones: Response) => {
+        return respones.json()
+      })
+      .then((res: UserProps) => this.set(res))
+  }
 }
