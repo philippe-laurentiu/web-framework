@@ -532,77 +532,65 @@ function hmrAcceptRun(bundle, id) {
 }
 
 },{}],"h7u1C":[function(require,module,exports) {
-var _user = require("./models/User");
-const data = {
-    id: 1,
-    name: "hasi",
-    age: 24
-};
-const user = new (0, _user.User)(data);
-user.on("change", ()=>{
-    console.log(user);
+var _collection = require("./models/Collection");
+const coll = new (0, _collection.Collection)("http://localhost:3000/users");
+coll.on("change", ()=>{
+    console.log(coll);
 });
-user.save();
+coll.fetch();
 
-},{"./models/User":"4rcHn"}],"4rcHn":[function(require,module,exports) {
+},{"./models/Collection":"dD11O"}],"dD11O":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "User", ()=>User);
-var _attributes = require("./Attributes");
+parcelHelpers.export(exports, "Collection", ()=>Collection);
 var _eventing = require("./Eventing");
-var _sync = require("./Sync");
-const rootUrl = "http://localhost:3000/users";
-class User {
-    constructor(attrs){
-        this.attrs = attrs;
-        this.events = new (0, _eventing.Eventing)();
-        this.sync = new (0, _sync.Sync)(rootUrl);
-        this.attributes = new (0, _attributes.Attributes)(attrs);
+var _user = require("./User");
+class Collection {
+    constructor(rootUrl){
+        this.rootUrl = rootUrl;
+        this.models = [];
+        this.eventing = new (0, _eventing.Eventing)();
     }
     get on() {
-        return this.events.on;
+        return this.eventing.on;
     }
     get trigger() {
-        return this.events.trigger;
-    }
-    get get() {
-        return this.attributes.get;
-    }
-    set(update) {
-        this.attributes.set(update);
-        this.events.trigger("change");
+        return this.eventing.trigger;
     }
     fetch() {
-        const id = this.attributes.get("id");
-        if (typeof id !== "number") throw new Error("Error: unabel to fetch");
-        this.sync.fetch(id).then((respones)=>{
-            return respones.json();
-        }).then((res)=>this.set(res));
-    }
-    save() {
-        this.sync.save(this.attributes.getAll()).then(()=>{
-            this.trigger("save");
+        fetch(this.rootUrl, {
+            method: "GET",
+            headers: {
+                "content-type": "application/json"
+            }
+        }).then((response)=>response.json()).then((response)=>{
+            response.forEach((userData)=>{
+                const user = (0, _user.User).buildUser(userData);
+                this.models.push(user);
+            });
+            this.trigger("change");
         });
     }
 }
 
-},{"./Attributes":"6Bbds","./Eventing":"7459s","./Sync":"QO3Gl","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6Bbds":[function(require,module,exports) {
+},{"./Eventing":"7459s","./User":"4rcHn","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7459s":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Attributes", ()=>Attributes);
-class Attributes {
-    constructor(data){
-        this.data = data;
-        this.get = (propName)=>{
-            return this.data[propName];
-        };
-    }
-    set(update) {
-        Object.assign(this.data, update);
-    }
-    getAll() {
-        return this.data;
-    }
+parcelHelpers.export(exports, "Eventing", ()=>Eventing);
+class Eventing {
+    events = {};
+    on = (eventName, callback)=>{
+        let handlers = this.events[eventName] || [];
+        handlers.push(callback);
+        this.events[eventName] = handlers;
+    };
+    trigger = (eventName)=>{
+        let handlers = this.events[eventName];
+        if (!handlers || handlers.length === 0) return;
+        handlers.forEach((callback)=>{
+            callback();
+        });
+    };
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
@@ -635,31 +623,82 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"7459s":[function(require,module,exports) {
+},{}],"4rcHn":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Eventing", ()=>Eventing);
-class Eventing {
-    events = {};
-    on = (eventName, callback)=>{
-        let handlers = this.events[eventName] || [];
-        handlers.push(callback);
-        this.events[eventName] = handlers;
-    };
-    trigger = (eventName)=>{
-        let handlers = this.events[eventName];
-        if (!handlers || handlers.length === 0) return;
-        handlers.forEach((callback)=>{
-            callback();
-        });
-    };
+parcelHelpers.export(exports, "User", ()=>User);
+var _model = require("./Model");
+var _attributes = require("./Attributes");
+var _apiSync = require("./ApiSync");
+var _eventing = require("./Eventing");
+const rootUrl = "http://localhost:3000/users";
+class User extends (0, _model.Model) {
+    static buildUser(attr) {
+        return new User(new (0, _attributes.Attributes)(attr), new (0, _apiSync.ApiSync)(rootUrl), new (0, _eventing.Eventing)());
+    }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"QO3Gl":[function(require,module,exports) {
+},{"./Model":"f033k","./Attributes":"6Bbds","./ApiSync":"3wylh","./Eventing":"7459s","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"f033k":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Sync", ()=>Sync);
-class Sync {
+parcelHelpers.export(exports, "Model", ()=>Model);
+class Model {
+    constructor(attributes, sync, events){
+        this.attributes = attributes;
+        this.sync = sync;
+        this.events = events;
+    }
+    get on() {
+        return this.events.on;
+    }
+    get trigger() {
+        return this.events.trigger;
+    }
+    get get() {
+        return this.attributes.get;
+    }
+    set(update) {
+        this.attributes.set(update);
+        this.events.trigger("change");
+    }
+    fetch() {
+        const id = this.attributes.get("id");
+        if (typeof id !== "number") throw new Error("Error: unabel to fetch");
+        this.sync.fetch(id).then((respones)=>{
+            return respones.json();
+        }).then((res)=>this.set(res));
+    }
+    save() {
+        this.sync.save(this.attributes.getAll()).then(()=>{
+            this.trigger("save");
+        });
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6Bbds":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Attributes", ()=>Attributes);
+class Attributes {
+    constructor(data){
+        this.data = data;
+        this.get = (propName)=>{
+            return this.data[propName];
+        };
+    }
+    set(update) {
+        Object.assign(this.data, update);
+    }
+    getAll() {
+        return this.data;
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3wylh":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ApiSync", ()=>ApiSync);
+class ApiSync {
     constructor(rootUrl){
         this.rootUrl = rootUrl;
     }

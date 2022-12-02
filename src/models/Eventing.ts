@@ -3,7 +3,7 @@ type callback = () => void
 export class Eventing {
   events: { [key: string]: callback[] } = {} 
 
-  on = (eventName: string, callback: callback) => {
+  on = (eventName: string, callback: callback): void => {
     let handlers = this.events[eventName] || []
     handlers.push(callback)
     this.events[eventName] = handlers
