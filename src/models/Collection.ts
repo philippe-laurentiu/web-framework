@@ -1,10 +1,14 @@
 import { Eventing } from './Eventing'
-import { User, UserProps } from './User'
-export class Collection {
-    models: User[] = []
+
+
+export class Collection<T, K> {
+    models: T[] = []
     eventing: Eventing = new Eventing()
 
-    constructor(public rootUrl: string){}
+    constructor(
+        public rootUrl: string,
+        public deserialise: (json: K) => T   
+        ){}
 
     get on() {
         return this.eventing.on
@@ -21,9 +25,8 @@ export class Collection {
                 'content-type': 'application/json'
             }
         }).then((response) => response.json()).then((response) => {
-            response.forEach((userData: UserProps) => {
-                const user = User.buildUser(userData)
-                this.models.push(user)
+            response.forEach((data: K) => {
+                this.models.push(this.deserialise(data))
             });
             this.trigger('change')
         })
