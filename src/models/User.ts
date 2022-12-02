@@ -49,4 +49,10 @@ export class User {
       })
       .then((res: UserProps) => this.set(res))
   }
+
+  save(): void {
+    this.sync.save(this.attributes.getAll()).then(() => {
+      this.trigger('save')
+    })
+  }
 }

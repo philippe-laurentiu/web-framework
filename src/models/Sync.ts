@@ -21,11 +21,12 @@ export class Sync<T extends HasId> {
 
     if (id) {
       return fetch(`${this.rootUrl}/${id}`, {
-        method: 'PUTS',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
+        redirect: 'follow'
       })
         // .then((respons) => respons.json)
         // .then((data) => console.log(data))
