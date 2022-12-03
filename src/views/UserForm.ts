@@ -2,10 +2,10 @@ import { User } from "../models/User"
 
 export class UserForm {
     constructor(public parent: Element, public user: User){
-        this.test()
+        this.changeListener()
     }
 
-    test(): void {
+    changeListener(): void {
         this.user.on('change', () => {
             this.render()
         })
@@ -13,7 +13,8 @@ export class UserForm {
 
     eventsMap(): { [key: string]: () => void } {
         return {
-            'click:.rand-age': this.onRandomAge,
+            'click:.set-age': this.onRandomAge,
+            'click:.set-name': this.onSetName
             // 'mouseenter:p':  this.onMouseEnter
         }
     }
@@ -29,6 +30,14 @@ export class UserForm {
         }
     }
 
+    onSetName = () => {
+        const element = this.parent.querySelector('input')
+        if (element) {
+            this.user.set({name: element.value})
+        }
+
+    }
+
     onRandomAge = () => {
         this.user.setRandomAge()
     }
@@ -39,8 +48,9 @@ export class UserForm {
                 <p>test</p>
                 <div>${this.user.get('name')}</div>
                 <div>${this.user.get('age')}</div>
-                <input />
-                <button class="rand-age">Random Age</button>
+                <input /> 
+                <button class="set-name">Set Name</button>
+                <button class="set-age">Random Age</button>
             </div>
         `
     }
