@@ -1,10 +1,17 @@
-import { User, UserProps } from './models/User'
+import { UserForm } from "./views/UserForm"
+import { User } from "./models/User"
 
+const root = document.getElementById('root')
 
-const coll = User.buildUserCollection()
-
-coll.on('change', () => {
-  console.log(coll)
-})
-
-coll.fetch()
+if (root) {
+  const user = User.buildUser({
+    id: 1,
+    name: 'hase',
+    age: 23
+  })
+  const uf = new UserForm(
+    root,
+    user
+  )
+  uf.render()
+}

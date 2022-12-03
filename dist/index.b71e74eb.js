@@ -532,14 +532,20 @@ function hmrAcceptRun(bundle, id) {
 }
 
 },{}],"h7u1C":[function(require,module,exports) {
+var _userForm = require("./views/UserForm");
 var _user = require("./models/User");
-const coll = (0, _user.User).buildUserCollection();
-coll.on("change", ()=>{
-    console.log(coll);
-});
-coll.fetch();
+const root = document.getElementById("root");
+if (root) {
+    const user = (0, _user.User).buildUser({
+        id: 1,
+        name: "hase",
+        age: 23
+    });
+    const uf = new (0, _userForm.UserForm)(root, user);
+    uf.render();
+}
 
-},{"./models/User":"4rcHn"}],"4rcHn":[function(require,module,exports) {
+},{"./models/User":"4rcHn","./views/UserForm":"gXSLD"}],"4rcHn":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "User", ()=>User);
@@ -555,6 +561,12 @@ class User extends (0, _model.Model) {
     }
     static buildUserCollection() {
         return new (0, _collection.Collection)(rootUrl, (json)=>User.buildUser(json));
+    }
+    setRandomAge() {
+        const randomAge = Math.round(Math.random() * 100);
+        this.set({
+            age: randomAge
+        });
     }
 }
 
@@ -735,6 +747,58 @@ class Collection {
     }
 }
 
-},{"./Eventing":"7459s","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["iJYvl","h7u1C"], "h7u1C", "parcelRequire94c2")
+},{"./Eventing":"7459s","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gXSLD":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "UserForm", ()=>UserForm);
+class UserForm {
+    constructor(parent, user){
+        this.parent = parent;
+        this.user = user;
+        this.onRandomAge = ()=>{
+            this.user.setRandomAge();
+        };
+        this.test();
+    }
+    test() {
+        this.user.on("change", ()=>{
+            this.render();
+        });
+    }
+    eventsMap() {
+        return {
+            "click:.rand-age": this.onRandomAge
+        };
+    }
+    bindEvents(fragment) {
+        const eventsMap = this.eventsMap();
+        for(let eventKey in eventsMap){
+            const [eventName, eventSelector] = eventKey.split(":");
+            fragment.querySelectorAll(eventSelector).forEach((element)=>{
+                element.addEventListener(eventName, eventsMap[eventKey]);
+            });
+        }
+    }
+    template() {
+        return `
+            <div>
+                <p>test</p>
+                <div>${this.user.get("name")}</div>
+                <div>${this.user.get("age")}</div>
+                <input />
+                <button class="rand-age">Random Age</button>
+            </div>
+        `;
+    }
+    render() {
+        this.parent.innerHTML = "";
+        const templateElement = document.createElement("template");
+        templateElement.innerHTML = this.template();
+        this.bindEvents(templateElement.content);
+        this.parent.append(templateElement.content);
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["iJYvl","h7u1C"], "h7u1C", "parcelRequire94c2")
 
 //# sourceMappingURL=index.b71e74eb.js.map
