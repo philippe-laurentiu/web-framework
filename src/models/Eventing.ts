@@ -1,7 +1,7 @@
 type callback = () => void
 
 export class Eventing {
-  events: { [key: string]: callback[] } = {} 
+  events: { [key: string]: callback[] } = {}
 
   on = (eventName: string, callback: callback): void => {
     let handlers = this.events[eventName] || []

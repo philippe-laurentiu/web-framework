@@ -12,21 +12,23 @@ export interface UserProps {
 
 const rootUrl = 'http://localhost:3000/users'
 
-export class User extends Model<UserProps>{
+export class User extends Model<UserProps> {
   static buildUser(attr: UserProps): User {
     return new User(
       new Attributes<UserProps>(attr),
       new ApiSync<UserProps>(rootUrl),
-      new Eventing(),
+      new Eventing()
     )
   }
 
   static buildUserCollection(): Collection<User, UserProps> {
-    return new Collection<User, UserProps>(rootUrl, (json: UserProps) => User.buildUser(json))
+    return new Collection<User, UserProps>(rootUrl, (json: UserProps) =>
+      User.buildUser(json)
+    )
   }
 
   setRandomAge(): void {
     const randomAge = Math.round(Math.random() * 100)
-    this.set({age: randomAge})
+    this.set({ age: randomAge })
   }
 }

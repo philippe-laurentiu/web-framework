@@ -12,8 +12,6 @@ export class ApiSync<T extends HasId> {
         'Content-Type': 'application/json',
       },
     })
-      // .then((respons) => respons.json)
-      // .then((data) => console.log('test'))
   }
 
   save(data: T): Promise<Response> {
@@ -26,10 +24,8 @@ export class ApiSync<T extends HasId> {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-        redirect: 'follow'
+        redirect: 'follow',
       })
-        // .then((respons) => respons.json)
-        // .then((data) => console.log(data))
     } else {
       return fetch(`${this.rootUrl}`, {
         method: 'POST',
@@ -38,8 +34,6 @@ export class ApiSync<T extends HasId> {
         },
         body: JSON.stringify(data),
       })
-        // .then((respons) => respons.json)
-        // .then((data) => console.log(data))
     }
   }
 }

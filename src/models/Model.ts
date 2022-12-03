@@ -1,15 +1,12 @@
-
-
 export interface ModelAttributes<T> {
-  get <K extends keyof T> (propName: K): T[K]
-  set (update: T): void
+  get<K extends keyof T>(propName: K): T[K]
+  set(update: T): void
   getAll(): T
 }
 
 export interface Sync<T> {
   fetch(id: number): Promise<Response>
   save(dat: T): Promise<Response>
-
 }
 
 type callback = () => void
@@ -26,7 +23,7 @@ export class Model<T extends HasId> {
   constructor(
     private attributes: ModelAttributes<T>,
     private sync: Sync<T>,
-    private events: Events 
+    private events: Events
   ) {}
 
   get on() {
